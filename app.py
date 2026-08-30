@@ -109,10 +109,10 @@ BASE_HTML = """
 @app.route('/')
 def home():
     content = """
-    <h1>🧠 도파민 프로젝트</h1>
-    <p style="text-align: center; font-size: 17px; color: #7f8c8d; margin-bottom: 25px;">올바른 재활용 배출 지침 검색 시스템</p>
+    <h1>♻️슬기로운 분리수거 생활🌎</h1>
+    <p style="text-align: center; font-size: 17px; color: #7f8c8d; margin-bottom: 25px;">재활용 배출 지침 검색 시스템</p>
     <p style="text-align: center; font-size: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-        상단의 <b>[분리수거 검색]</b> 메뉴를 터치하여<br> 버리려는 쓰레기의 품목을 직접 입력해보세요!
+        상단의 <b>[분리수거 검색]</b> 메뉴를 터치하여<br> 버리려는 쓰레기의 품목을 입력해보세요.
     </p>
     """
     return render_template_string(BASE_HTML.replace("{% block content %}{% endblock %}", content))
@@ -182,7 +182,7 @@ def introduce():
     content = """
     <h2>📋 프로젝트 소개</h2>
     <p style="line-height: 1.8;">
-        이 웹앱은 학교 내 올바른 분리배출 문화를 정착시키고 자원 순환을 장려하기 위해 기획된 <b>'도파민 프로젝트'</b>입니다.
+        이 웹앱은 학교 내 올바른 분리배출과 자원순환을 장려하기 위해 기획된 <b>'도파민 프로젝트'</b>입니다.
     </p>
     <p style="line-height: 1.8; background: #fffde7; padding: 12px; border-radius: 8px; border-left: 4px solid #f1c40f; font-size: 14px;">
         📌 구글 스프레드시트와 24시간 실시간 연동되어 학교 지침이 변경되거나 새로운 품목이 추가되면 즉시 검색 데이터에 반영됩니다.
