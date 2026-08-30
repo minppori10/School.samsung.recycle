@@ -16,7 +16,7 @@ BASE_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏫 학교 분리수거 프로젝트</title>
+    <title>♻️슬기로운 분리수거 생활🌎</title>
     <style>
         body { 
             font-family: 'Malgun Gothic', -apple-system, sans-serif; 
