@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # 구글 스프레드시트 실시간 CSV 주소 연동
 SHEET_ID = "1-bSsM-fyNLy9P7d0QA1Wi6kXc2IYYrZh1DucjDXg6-g"
-SHEET_URL = f"https://google.com{SHEET_ID}/export?format=csv"
+SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
 
 # 반응형 웹디자인 (CSS)
