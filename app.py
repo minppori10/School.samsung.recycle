@@ -8,6 +8,7 @@ app = Flask(__name__)
 SHEET_ID = "1-bSsM-fyNLy9P7d0QA1Wi6kXc2IYYrZh1DucjDXg6-g"
 SHEET_URL = f"https://google.com{SHEET_ID}/export?format=csv"
 
+
 # 반응형 웹디자인 (CSS)
 BASE_HTML = """
 <!DOCTYPE html>
