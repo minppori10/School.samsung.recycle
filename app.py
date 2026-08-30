@@ -157,7 +157,7 @@ def recycle():
     content = f"""
     <h2>🔍 우리 학교 분리수거 검색</h2>
     <form action="/recycle" method="GET" class="search-box">
-        <input type="text" name="keyword" placeholder="예: 우유팩, 페트병, 지우개" value="">
+        <input type="text" name="keyword" placeholder="예: 우유팩, 과자봉지 등" value="">
         <button type="submit">검색</button>
     </form>
     """
