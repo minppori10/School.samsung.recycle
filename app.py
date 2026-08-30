@@ -9,7 +9,7 @@ SHEET_ID = "1-bSsM-fyNLy9P7d0QA1Wi6kXc2IYYrZh1DucjDXg6-g"
 SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
 
-# 반응형 웹디자인 (CSS)
+# [디자인] 반응형 뷰포트와 초록색 감성의 CSS 카드 디자인 틀
 BASE_HTML = """
 <!DOCTYPE html>
 <html>
@@ -128,27 +128,32 @@ def recycle():
             response = urlopen(SHEET_URL)
             lines = [line.decode('utf-8') for line in response.readlines()]
             
-            # 2. 파이썬 순수 리스트 구조로 안전하게 데이터를 정렬
+            # 2. 파이썬 CSV 판독기로 파싱하여 안전하게 리스트화
             reader = csv.reader(lines)
             all_rows = [row for row in reader if row]
             
             if len(all_rows) > 1:
-                # 🔴 [오류 완벽 해결] 첫 행(헤더)을 제외하고 데이터 행들만 순회합니다.
+                # 첫 행(헤더)을 제외하고 데이터 행들만 순회합니다.
                 for row_data in all_rows[1:]:
-                    if len(row_data) >= 2:
-                        # 무조건 1번째 칸(A열)을 품목, 2번째 칸(B열)을 배출법으로 강제 지정합니다!
-                        품목_value = row_data[0].strip()
-                        방법_value = row_data[1].strip()
+                    # 🔴 [오류 완벽 해결] 빈 칸을 제외하고 '진짜 글자가 들어있는 칸'만 리스트로 확보합니다.
+                    valid_cells = [cell.strip() for cell in row_data if cell.strip()]
+                    
+                    if len(valid_cells) >= 2:
+                        # 글자가 적힌 맨 첫 번째 칸(A열 주변)을 품목 이름으로 지정
+                        품목_value = valid_cells[0]
+                        # 글자가 적힌 맨 마지막 칸(B열 혹은 그 뒤)을 방법 텍스트로 지정
+                        방법_value = valid_cells[-1]
                         
-                        # 사용자가 검색한 글자가 품목 이름에 포함되어 있다면 결과 추가
+                        # 사용자가 검색한 글자가 시트 품목 칸에 포함된다면 결과 리스트에 바인딩
                         if keyword.lower() in 품목_value.lower():
                             results.append({
                                 '품목': 품목_value,
                                 '방법': 방법_value
                             })
         except Exception as e:
-            print(f"❌ 데이터 매칭 실패 오류: {e}")
+            print(f"❌ 데이터 로드 혹은 매칭 오류 발생: {e}")
 
+    # 검색창 인터페이스 (value=""로 자동 초기화 리셋 반영)
     content = f"""
     <h2>🔍 우리 학교 분리수거 검색</h2>
     <form action="/recycle" method="GET" class="search-box">
@@ -192,4 +197,3 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-
