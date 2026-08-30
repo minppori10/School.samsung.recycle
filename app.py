@@ -126,32 +126,37 @@ def recycle():
 
     if keyword:
         try:
+            # 1. 구글 스프레드시트 CSV 호출 및 줄 단위 가공
             response = urlopen(SHEET_URL)
             lines = [line.decode('utf-8').strip() for line in response.readlines() if line.strip()]
             
+            # 2. 파이썬 CSV 판독기로 데이터 리스트화
             reader = csv.reader(lines)
             all_rows = list(reader)
             
             if all_rows:
+                # 🔴 [오류 완벽 버그 수정] 첫 줄(제목행)의 실제 데이터들만 리스트로 확보합니다.
                 header = [h.strip() for h in all_rows[0]]
+                
+                # A열 제목(0번 위치)과 B열 제목(1번 위치)을 순서(인덱스)로 강제 추적합니다.
                 col_품목 = header[0]
                 col_방법 = header[1] if len(header) > 1 else header[0]
                 
-                for row_data in all_rows[1:]:
-                    if len(row_data) >= len(header):
-                        row_dict = dict(zip(header, [r.strip() for r in row_data]))
-                        품목_value = row_dict.get(col_품목, '')
-                        방법_value = row_dict.get(col_방법, '')
-                        
-                        if keyword.lower() in 품목_value.lower():
-                            results.append({
-                                '품목': 품목_value,
-                                '방법': 방법_value
-                            })
+                # 다시 딕셔너리 구조로 묶어서 키워드가 포함되었는지 필터링
+                dict_reader = csv.DictReader(lines)
+                for row in dict_reader:
+                    품목_value = row.get(col_품목, '').strip()
+                    방법_value = row.get(col_방법, '').strip()
+                    
+                    # 사용자가 검색한 글자가 포함되어 있다면 결과 리스트에 바인딩
+                    if keyword.lower() in 품목_value.lower():
+                        results.append({
+                            '품목': 품목_value,
+                            '방법': 방법_value
+                        })
         except Exception as e:
-            print(f"❌ 데이터 로드 실패: {e}")
+            print(f"❌ 실시간 데이터 로드 실패: {e}")
 
-    # 검색 폼 생성 (value="" 리셋 반영)
     content = f"""
     <h2>🔍 우리 학교 분리수거 검색</h2>
     <form action="/recycle" method="GET" class="search-box">
@@ -166,13 +171,15 @@ def recycle():
             for item in results:
                 content += f"""
                 <div class="result-card">
-                    <p class="result-method"><b>방법:</b> {item['방법']}</p>
+                    <p class="result-title">🌱 {item['품목']} <span class="badge">학교 지침</span></p>
+                    <p class="result-method"><b>배출법:</b> {item['배출방법']}</p>
                 </div>
                 """
         else:
             content += f"<p class='no-result'>❌ '{keyword}'에 대한 배출 방법이 등록되지 않았습니다.<br><span style='font-size:13px; font-weight:normal; color:#7f8c8d;'>일반쓰레기 배출을 고려하시거나 소개 페이지의 이메일로 문의주세요.</span></p>"
 
     return render_template_string(BASE_HTML.replace("{% block content %}{% endblock %}", content))
+
 
 @app.route('/introduce')
 def introduce():
