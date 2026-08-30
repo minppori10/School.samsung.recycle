@@ -8,14 +8,14 @@ app = Flask(__name__)
 SHEET_ID = "1-bSsM-fyNLy9P7d0QA1Wi6kXc2IYYrZh1DucjDXg6-g"
 SHEET_URL = f"https://google.com{SHEET_ID}/export?format=csv"
 
-# 🟢 [디자인 추가] 모든 페이지에 공통으로 들어갈 세련된 네비게이션 바와 CSS 디자인 틀입니다.
+# 반응형 웹디자인 (CSS)
 BASE_HTML = """
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼성여고 슬기로운 분리수거 생활</title>
+    <title>🏫 학교 분리수거 프로젝트</title>
     <style>
         body { 
             font-family: 'Malgun Gothic', -apple-system, sans-serif; 
@@ -44,7 +44,6 @@ BASE_HTML = """
         }
         nav a:hover { color: #2ecc71; }
         
-        /* 컨텐츠 카드 디자인 */
         .card {
             background: white;
             padding: 25px;
@@ -55,7 +54,6 @@ BASE_HTML = """
         h1, h2 { color: #2ecc71; text-align: center; margin-top: 0; }
         p { color: #34495e; word-break: keep-all; }
         
-        /* 검색창 및 버튼 스타일 */
         .search-box { display: flex; gap: 10px; margin: 20px 0; }
         input[type="text"] { 
             flex: 1; 
@@ -80,7 +78,6 @@ BASE_HTML = """
         }
         button:hover { background-color: #27ae60; }
         
-        /* 결과 카드 디자인 */
         .result-card { 
             background: #f9fbf9; 
             border-left: 5px solid #2ecc71; 
@@ -111,10 +108,10 @@ BASE_HTML = """
 @app.route('/')
 def home():
     content = """
-    <h1>삼성여고 슬기로운 분리수거 생활♻️</h1>
+    <h1>🧠 도파민 프로젝트</h1>
     <p style="text-align: center; font-size: 17px; color: #7f8c8d; margin-bottom: 25px;">올바른 재활용 배출 지침 검색 시스템</p>
     <p style="text-align: center; font-size: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-        상단의 <b>[분리수거 검색]</b> 메뉴를 터치하여<br> 버리려는 쓰레기의 품목을 입력해보세요.
+        상단의 <b>[분리수거 검색]</b> 메뉴를 터치하여<br> 버리려는 쓰레기의 품목을 직접 입력해보세요!
     </p>
     """
     return render_template_string(BASE_HTML.replace("{% block content %}{% endblock %}", content))
@@ -126,36 +123,30 @@ def recycle():
 
     if keyword:
         try:
-            # 1. 구글 스프레드시트 CSV 호출 및 줄 단위 가공
+            # 1. 구글 스프레드시트 실시간 데이터 호출
             response = urlopen(SHEET_URL)
-            lines = [line.decode('utf-8').strip() for line in response.readlines() if line.strip()]
+            lines = [line.decode('utf-8') for line in response.readlines()]
             
-            # 2. 파이썬 CSV 판독기로 데이터 리스트화
+            # 2. 파이썬 순수 리스트 구조로 안전하게 데이터를 정렬
             reader = csv.reader(lines)
-            all_rows = list(reader)
+            all_rows = [row for row in reader if row]
             
-            if all_rows:
-                # 🔴 [오류 완벽 버그 수정] 첫 줄(제목행)의 실제 데이터들만 리스트로 확보합니다.
-                header = [h.strip() for h in all_rows[0]]
-                
-                # A열 제목(0번 위치)과 B열 제목(1번 위치)을 순서(인덱스)로 강제 추적합니다.
-                col_품목 = header[0]
-                col_방법 = header[1] if len(header) > 1 else header[0]
-                
-                # 다시 딕셔너리 구조로 묶어서 키워드가 포함되었는지 필터링
-                dict_reader = csv.DictReader(lines)
-                for row in dict_reader:
-                    품목_value = row.get(col_품목, '').strip()
-                    방법_value = row.get(col_방법, '').strip()
-                    
-                    # 사용자가 검색한 글자가 포함되어 있다면 결과 리스트에 바인딩
-                    if keyword.lower() in 품목_value.lower():
-                        results.append({
-                            '품목': 품목_value,
-                            '방법': 방법_value
-                        })
+            if len(all_rows) > 1:
+                # 🔴 [오류 완벽 해결] 첫 행(헤더)을 제외하고 데이터 행들만 순회합니다.
+                for row_data in all_rows[1:]:
+                    if len(row_data) >= 2:
+                        # 무조건 1번째 칸(A열)을 품목, 2번째 칸(B열)을 배출법으로 강제 지정합니다!
+                        품목_value = row_data[0].strip()
+                        방법_value = row_data[1].strip()
+                        
+                        # 사용자가 검색한 글자가 품목 이름에 포함되어 있다면 결과 추가
+                        if keyword.lower() in 품목_value.lower():
+                            results.append({
+                                '품목': 품목_value,
+                                '방법': 방법_value
+                            })
         except Exception as e:
-            print(f"❌ 실시간 데이터 로드 실패: {e}")
+            print(f"❌ 데이터 매칭 실패 오류: {e}")
 
     content = f"""
     <h2>🔍 우리 학교 분리수거 검색</h2>
@@ -171,8 +162,8 @@ def recycle():
             for item in results:
                 content += f"""
                 <div class="result-card">
-                    <p class="result-title">🌱 {item['품목']} <span class="badge">학교 지침</span></p>
-                    <p class="result-method"><b>배출법:</b> {item['배출방법']}</p>
+                    <p class="result-title">🌱 {item['품목']} <span class="badge">방법</span></p>
+                    <p class="result-method"><b>방법:</b> {item['방법']}</p>
                 </div>
                 """
         else:
@@ -180,16 +171,15 @@ def recycle():
 
     return render_template_string(BASE_HTML.replace("{% block content %}{% endblock %}", content))
 
-
 @app.route('/introduce')
 def introduce():
     content = """
     <h2>📋 프로젝트 소개</h2>
     <p style="line-height: 1.8;">
-        이 웹앱은 학교 내 자원 순환을 장려하기 위해 기획된 <b>'도파민 프로젝트'</b>입니다.
+        이 웹앱은 학교 내 올바른 분리배출 문화를 정착시키고 자원 순환을 장려하기 위해 기획된 <b>'도파민 프로젝트'</b>입니다.
     </p>
     <p style="line-height: 1.8; background: #fffde7; padding: 12px; border-radius: 8px; border-left: 4px solid #f1c40f; font-size: 14px;">
-        📌 구글 스프레드시트와 24시간 실시간 연동되어 새로운 품목이 추가되면 즉시 검색 데이터에 반영됩니다.
+        📌 구글 스프레드시트와 24시간 실시간 연동되어 학교 지침이 변경되거나 새로운 품목이 추가되면 즉시 검색 데이터에 반영됩니다.
     </p>
     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee;">
         <p style="margin: 5px 0;"><b>📧 문의 사항:</b> bonajohn3409@gmail.com</p>
@@ -201,3 +191,4 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
