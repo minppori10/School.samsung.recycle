@@ -168,7 +168,7 @@ def recycle():
             for item in results:
                 content += f"""
                 <div class="result-card">
-                    <p class="result-title">🌱 {item['품목']} <span class="badge">방법</span></p>
+                    <p class="result-title">🌱 {item['품목']} <span class="badge">♻️</span></p>
                     <p class="result-method"><b>방법:</b> {item['방법']}</p>
                 </div>
                 """
@@ -182,10 +182,10 @@ def introduce():
     content = """
     <h2>📋 프로젝트 소개</h2>
     <p style="line-height: 1.8;">
-        이 웹앱은 학교 내 올바른 분리배출과 자원순환을 장려하기 위해 기획된 <b>'도파민 프로젝트'</b>입니다.
+        이 웹은 학교 내 올바른 분리배출과 자원순환을 장려하기 위해 기획된 <b>'도파민 프로젝트'</b>입니다.
     </p>
     <p style="line-height: 1.8; background: #fffde7; padding: 12px; border-radius: 8px; border-left: 4px solid #f1c40f; font-size: 14px;">
-        📌 구글 스프레드시트와 24시간 실시간 연동되어 학교 지침이 변경되거나 새로운 품목이 추가되면 즉시 검색 데이터에 반영됩니다.
+        📌 구글 스프레드시트와 24시간 실시간 연동되어 새로운 품목이 추가되면 즉시 검색 데이터에 반영됩니다.
     </p>
     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee;">
         <p style="margin: 5px 0;"><b>📧 문의 사항:</b> bonajohn3409@gmail.com</p>
